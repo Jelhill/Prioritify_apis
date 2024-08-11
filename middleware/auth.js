@@ -1,22 +1,23 @@
-const jwt = require("jsonwebtoken"); // used to create, sign, and verify tokens
+import jwt from 'jsonwebtoken';
 
-const config = process.env; // get config vars
+const config = process.env;
 
 const verifyToken = (req, res, next) => {
   const token =
-    req.body.token || req.query.token || req.headers["x-access-token"]; // Get token from body, query, or headers
+    req.body.token || req.query.token || req.headers['x-access-token'];
 
-  // Check if token exists
   if (!token) {
-    return res.status(403).send("A token is required for authentication");
+    return res.status(403).send('A token is required for authentication');
   }
+  
   try {
-    const decoded = jwt.verify(token, config.TOKEN_KEY); // Verify token
-    req.user = decoded; // Save decoded token to request object
+    const decoded = jwt.verify(token, config.TOKEN_KEY);
+    req.user = decoded;
   } catch (err) {
-    return res.status(401).send("Invalid Token"); // If token is invalid, return error
+    return res.status(401).send('Invalid Token');
   }
-  return next(); // If token is valid, continue
+
+  return next();
 };
 
-module.exports = verifyToken;
+export default verifyToken;

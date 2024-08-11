@@ -1,93 +1,74 @@
-const User = require("../models/User"); // Import User Model Schema
-const bcrypt = require("bcryptjs"); // Import Bcrypt Package
-const jwt = require("jsonwebtoken"); // Import Jsonwebtoken Package
-require("dotenv").config(); // Import dotenv Package
+import User from '../models/User.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import { StatusCodes } from '../constants/statusCodes.js';
+import ResponseHandler from '../utils/responseHandler.js'; // Import without 'new'
+
+dotenv.config();
 
 // Register User
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
   try {
-    // Get user input
-    const { first_name, last_name, email, password, picture } = req.body; // Destructure req.body
-    // console.log(req.body);
+    const { full_name, email, password } = req.body;
 
-    // Validate user input
-    if (!(email && password && first_name && last_name)) {
-      return res.status(400).send("All input is required");
+    if (!(email && password && full_name)) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'All input is required');
     }
 
-    // check if user already exists
-    // Validate if user exists in our database
-    const oldUser = await User.findOne({ email }); // Find user with requested email
-
+    const oldUser = await User.findOne({ email });
+    console.log(oldUser)
     if (oldUser) {
-      return res.status(409).send("User Already Exist. Please Login");
+      return ResponseHandler.error(res, StatusCodes.CONFLICT, 'User Already Exist. Please Login');
     }
 
-    // Encrypt user password
-    const encryptedPassword = await bcrypt.hash(password, 10); // Encrypt password with bcryptjs
+    const encryptedPassword = await bcrypt.hash(password, 10);
 
-    // Create user in our database
     const user = await User.create({
-      first_name,
-      last_name,
-      email: email.toLowerCase(), // sanitize: convert email to lowercase
+      full_name,
+      email: email.toLowerCase(),
       password: encryptedPassword,
-      picture: picture
     });
 
-    // Create token
     const token = jwt.sign(
       { user_id: user._id, email },
       process.env.TOKEN_KEY,
-      {
-        expiresIn: "2h",
-      }
+      { expiresIn: '2h' }
     );
-    
-    // Return new user and token
-    res.status(201).json({ user, token });
+
+    return ResponseHandler.success(res, { user, token }, 'User registered successfully', StatusCodes.CREATED);
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Server error");
+    console.error(err);
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
 
-
 // Login User
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
-    // Get user input
     const { email, password } = req.body;
 
-    // Validate user input
     if (!(email && password)) {
-      return res.status(400).send("All input is required");
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'All input is required');
     }
-    
-    // Validate if user exists in our database
+
     const user = await User.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      // Create token
       const token = jwt.sign(
         { user_id: user._id, email },
         process.env.TOKEN_KEY,
-        {
-          expiresIn: "2h",
-        }
+        { expiresIn: '2h' }
       );
 
-      // Save user token
       user.token = token;
 
-      // Send user response
-      return res.status(200).json(user);
+      return ResponseHandler.success(res, user, 'Login successful', StatusCodes.OK);
     }
 
-    // Invalid credentials
-    return res.status(400).send("Invalid Credentials");
+    return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Invalid Credentials');
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
-}
-
+};
