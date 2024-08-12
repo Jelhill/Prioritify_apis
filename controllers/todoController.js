@@ -1,66 +1,166 @@
 import Todo from '../models/Todo.js';
+import { validationResult } from 'express-validator';
+import { StatusCodes } from '../constants/statusCodes.js';
+import ResponseHandler from '../utils/responseHandler.js';
 
 export const getAllTodos = async (req, res) => {
   try {
-    const { userId } = req.query;
-    const todos = await Todo.find({ userId });
-    res.json(todos);
+    const todos = await Todo.find({});
+    return ResponseHandler.success(res, todos);
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.log(error);
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
+  }
+};
+
+export const getTodoById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Todo ID is required');
+    }
+
+    const todo = await Todo.findById(id);
+
+    if (!todo) {
+      return ResponseHandler.error(res, StatusCodes.NOT_FOUND, 'Todo not found');
+    }
+
+    return ResponseHandler.success(res, todo, 'Todo retrieved successfully');
+  } catch (error) {
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
+  }
+};
+
+export const getTodosByUserId = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+
+    if (!userId) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'User ID is required');
+    }
+
+    const todos = await Todo.find({ userId });
+
+    if (!todos.length) {
+      return ResponseHandler.error(res, StatusCodes.NOT_FOUND, 'No todos found for this user');
+    }
+
+    return ResponseHandler.success(res, todos, 'Todos retrieved successfully');
+  } catch (error) {
+    console.log(error);
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
+  }
+};
+
+export const getCompletedTasksByUser = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+
+    if (!userId) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'User ID is required');
+    }
+
+    const completedTasks = await Todo.find({ userId, status: 'COMPLETED' });
+
+    return ResponseHandler.success(res, completedTasks, 'Completed tasks retrieved successfully');
+  } catch (error) {
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
 
 export const createTodo = async (req, res) => {
   try {
-    const { task } = req.body;
-    const { userId } = req.query;
+    // Validate request
+    console.log("creatiung todo")
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Validation errors', errors.array());
+    }
 
+    // Extract fields from request body
+    const { title, description, priority, startTime, endTime, durationMinutes, reminder, status } = req.body;
+    const userId = req.user.user_id;
+    
+    // Create new Todo
     const todo = new Todo({
-      task,
+      title,
+      description,
+      priority,
+      startTime,
+      endTime,
+      durationMinutes,
+      reminder,
+      status,
       userId,
     });
 
+    // Save to database
     await todo.save();
-    res.status(201).json(todo);
+
+    // Respond with success
+    return ResponseHandler.success(res, todo, 'Todo created successfully', StatusCodes.CREATED);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: `Server error: ${error.message}` });
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
 
 export const updateTodo = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { task, completed, completed_time } = req.body;
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Validation errors', errors.array());
+    }
 
+    // Extract fields from request body
+    const { id } = req.params;
+    const { title, description, priority, startTime, endTime, durationMinutes, reminder, status, completedTime } = req.body;
+
+    // Update Todo
     const todo = await Todo.findByIdAndUpdate(
       id,
-      { task, completed, completed_time },
+      { title, description, priority, startTime, endTime, durationMinutes, reminder, status, completedTime },
       { new: true }
     );
 
-    res.json(todo);
+    if (!todo) {
+      return ResponseHandler.error(res, StatusCodes.NOT_FOUND, 'Todo not found');
+    }
+
+    return ResponseHandler.success(res, todo, 'Todo updated successfully');
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
 
 export const deleteTodo = async (req, res) => {
   try {
     const { id } = req.params;
-    await Todo.findOneAndDelete({ _id: id });
-    res.json({ message: 'Todo deleted successfully' });
+    const todo = await Todo.findByIdAndDelete(id);
+
+    if (!todo) {
+      return ResponseHandler.error(res, StatusCodes.NOT_FOUND, 'Todo not found');
+    }
+
+    return ResponseHandler.success(res, null, 'Todo deleted successfully');
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
 
 export const deleteAllTodos = async (req, res) => {
   try {
     const { userId } = req.query;
+    if (!userId) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'User ID is required');
+    }
+
     await Todo.deleteMany({ userId });
-    res.json({ message: 'All todos deleted successfully', status: 200 });
+    return ResponseHandler.success(res, null, 'All todos deleted successfully');
   } catch (error) {
-    res.status(500).json({ message: 'Server error', status: 500 });
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
