@@ -17,7 +17,6 @@ export const register = async (req, res) => {
     }
 
     const oldUser = await User.findOne({ email });
-    console.log(oldUser)
     if (oldUser) {
       return ResponseHandler.error(res, StatusCodes.CONFLICT, 'User Already Exist. Please Login');
     }

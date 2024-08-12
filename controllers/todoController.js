@@ -8,7 +8,6 @@ export const getAllTodos = async (req, res) => {
     const todos = await Todo.find({});
     return ResponseHandler.success(res, todos);
   } catch (error) {
-    console.log(error);
     return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
   }
 };
@@ -49,7 +48,6 @@ export const getTodosByUserId = async (req, res) => {
 
     return ResponseHandler.success(res, todos, 'Todos retrieved successfully');
   } catch (error) {
-    console.log(error);
     return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
@@ -73,7 +71,6 @@ export const getCompletedTasksByUser = async (req, res) => {
 export const createTodo = async (req, res) => {
   try {
     // Validate request
-    console.log("creatiung todo")
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Validation errors', errors.array());
@@ -102,7 +99,6 @@ export const createTodo = async (req, res) => {
     // Respond with success
     return ResponseHandler.success(res, todo, 'Todo created successfully', StatusCodes.CREATED);
   } catch (error) {
-    console.log(error);
     return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
@@ -160,6 +156,66 @@ export const deleteAllTodos = async (req, res) => {
 
     await Todo.deleteMany({ userId });
     return ResponseHandler.success(res, null, 'All todos deleted successfully');
+  } catch (error) {
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
+  }
+};
+
+// Update the status of a Todo item
+export const updateTodoStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Status is required');
+    }
+
+    // Validate status value
+    const validStatuses = ['PENDING', 'COMPLETED', 'CANCELLED'];
+    if (!validStatuses.includes(status)) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Invalid status value');
+    }
+    const todo = await Todo.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!todo) {
+      return ResponseHandler.error(res, StatusCodes.NOT_FOUND, 'Todo not found');
+    }
+
+    return ResponseHandler.success(res, todo, 'Todo status updated successfully');
+  } catch (error) {
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
+  }
+};
+
+
+// Get all tasks for a user based on status
+export const getTodosByStatus = async (req, res) => {
+  try {
+    const userId = req.user.user_id; 
+    const { status } = req.query;
+
+    if (!status) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Status is required');
+    }
+
+    // Validate status value
+    const validStatuses = ['PENDING', 'COMPLETED', 'CANCELLED'];
+    if (!validStatuses.includes(status)) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Invalid status value');
+    }
+
+    const todos = await Todo.find({ userId, status });
+
+    if (!todos.length) {
+      return ResponseHandler.error(res, StatusCodes.NOT_FOUND, 'No todos found for this status');
+    }
+
+    return ResponseHandler.success(res, todos, 'Todos retrieved successfully');
   } catch (error) {
     return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
