@@ -7,7 +7,6 @@ import ResponseHandler from '../utils/responseHandler.js'; // Import without 'ne
 
 dotenv.config();
 
-// Register User
 export const register = async (req, res) => {
   try {
     const { full_name, email, password } = req.body;
@@ -42,7 +41,6 @@ export const register = async (req, res) => {
   }
 };
 
-// Login User
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;

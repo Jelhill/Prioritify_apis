@@ -3,9 +3,8 @@ import jwt from 'jsonwebtoken';
 const config = process.env;
 
 const verifyToken = (req, res, next) => {
-  // Extract the token from the Authorization header
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Get the token part after 'Bearer'
+  const token = authHeader && authHeader.split(' ')[1];
   if (!token) {
     return res.status(403).send('A token is required for authentication');
   }

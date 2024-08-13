@@ -86,43 +86,6 @@ describe('TodoController', () => {
       expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
       expect(res.json).toHaveBeenCalledWith(todo);
     });
-
-    // it('should handle missing ID', async () => {
-    //   await todoController.getTodoById(req, res);
-
-    //   expect(res.status).toHaveBeenCalledWith(StatusCodes.BAD_REQUEST);
-    //   expect(res.json).toHaveBeenCalledWith({
-    //     success: false,
-    //     message: 'Todo ID is required'
-    //   });
-    // });
-
-    // it('should handle todo not found', async () => {
-    //   req.params.id = 'testTodoId';
-    //   Todo.findById.mockResolvedValue(null);
-
-    //   await todoController.getTodoById(req, res);
-
-    //   expect(res.status).toHaveBeenCalledWith(StatusCodes.NOT_FOUND);
-    //   expect(res.json).toHaveBeenCalledWith({
-    //     success: false,
-    //     message: 'Todo not found'
-    //   });
-    // });
-
-    // it('should handle server error', async () => {
-    //   req.params.id = 'testTodoId';
-    //   Todo.findById.mockRejectedValue(new Error('Server error'));
-
-    //   await todoController.getTodoById(req, res);
-
-    //   expect(res.status).toHaveBeenCalledWith(StatusCodes.INTERNAL_SERVER_ERROR);
-    //   expect(res.json).toHaveBeenCalledWith({
-    //     success: false,
-    //     message: 'Server error',
-    //     error: 'Server error'
-    //   });
-    // });
   });
 
   describe('getTodosByUserId', () => {
@@ -135,42 +98,5 @@ describe('TodoController', () => {
       expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
       expect(res.json).toHaveBeenCalledWith(todos);
     });
-
-    // it('should handle missing userId', async () => {
-    //   req.user.user_id = null;
-
-    //   await todoController.getTodosByUserId(req, res);
-
-    //   expect(res.status).toHaveBeenCalledWith(StatusCodes.BAD_REQUEST);
-    //   expect(res.json).toHaveBeenCalledWith({
-    //     success: false,
-    //     message: 'User ID is required'
-    //   });
-    // });
-
-    // it('should handle no todos found', async () => {
-    //   Todo.find.mockResolvedValue([]);
-
-    //   await todoController.getTodosByUserId(req, res);
-
-    //   expect(res.status).toHaveBeenCalledWith(StatusCodes.NOT_FOUND);
-    //   expect(res.json).toHaveBeenCalledWith({
-    //     success: false,
-    //     message: 'No todos found for this user'
-    //   });
-    // });
-
-    // it('should handle server error', async () => {
-    //   Todo.find.mockRejectedValue(new Error('Server error'));
-
-    //   await todoController.getTodosByUserId(req, res);
-
-    //   expect(res.status).toHaveBeenCalledWith(StatusCodes.INTERNAL_SERVER_ERROR);
-    //   expect(res.json).toHaveBeenCalledWith({
-    //     success: false,
-    //     message: 'Server error',
-    //     error: 'Server error'
-    //   });
-    // });
   });
 });
