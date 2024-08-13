@@ -188,6 +188,7 @@ export const updateTodoStatus = async (req, res) => {
 
     return ResponseHandler.success(res, todo, 'Todo status updated successfully');
   } catch (error) {
+    console.log(error);
     return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
