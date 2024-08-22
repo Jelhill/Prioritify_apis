@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "test": "jest"
+    "test": "jest",
+    "start": "node index.js"
   },
   "author": "Haziq Ali",
   "license": "ISC",
@@ -19,10 +20,10 @@
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^8.5.2",
-    "morgan": "^1.10.0",
-    "nodemon": "^2.0.22"
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "nodemon": "^2.0.22",
     "@babel/cli": "^7.24.8",
     "@babel/core": "^7.25.2",
     "@babel/node": "^7.25.0",

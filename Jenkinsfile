@@ -2,7 +2,12 @@ pipeline {
     agent any
 
     stages {
-        stage('without docker') {
+        stage('Build') {
+            agent {
+                docker {
+                    image 'node:alpine'
+                }
+            }
             steps {
                 sh 'echo "Hello Jenkins World!"'
             }
