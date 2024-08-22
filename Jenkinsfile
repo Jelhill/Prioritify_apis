@@ -30,7 +30,7 @@ pipeline {
             steps {
                 sh '''
                     ls -la
-                    npm run test
+                    npm run test:jest
                 '''
             }
         }
