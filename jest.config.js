@@ -6,4 +6,11 @@ export default {
   transform: {
     '^.+\\.js$': 'babel-jest', // Ensure you have babel-jest installed for ES modules
   },
+  reporters: [
+    'default',
+    ['jest-junit', {
+      outputDirectory: 'test-results', // Directory for JUnit reports
+      outputName: 'junit.xml'           // Name of the JUnit report file
+    }]
+  ]
 };
