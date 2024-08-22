@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('without docker') {
             steps {
-                sh 'echo "Hello World!"'
+                sh 'echo "Hello Jenkins World!"'
             }
         }
     }
