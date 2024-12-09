@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="12" failures="2" errors="0" time="2.332">
+  <testsuite name="TodoController" errors="0" failures="0" skipped="0" timestamp="2024-12-09T04:32:13" time="1.486" tests="4">
+    <testcase classname="TodoController getAllTodos should get all todos" name="TodoController getAllTodos should get all todos" time="0.008">
+    </testcase>
+    <testcase classname="TodoController getAllTodos should handle server error" name="TodoController getAllTodos should handle server error" time="0.001">
+    </testcase>
+    <testcase classname="TodoController getTodoById should get a todo by ID" name="TodoController getTodoById should get a todo by ID" time="0.002">
+    </testcase>
+    <testcase classname="TodoController getTodosByUserId should get all todos by userId" name="TodoController getTodosByUserId should get all todos by userId" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="UserController" errors="0" failures="2" skipped="0" timestamp="2024-12-09T04:32:13" time="1.567" tests="8">
+    <testcase classname="UserController register should register a user successfully" name="UserController register should register a user successfully" time="0.04">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+Expected: {&quot;json&quot;: [Function mockConstructor], &quot;status&quot;: [Function mockConstructor]}, {&quot;token&quot;: &quot;token&quot;, &quot;user&quot;: {&quot;_id&quot;: &quot;userId&quot;, &quot;email&quot;: &quot;john.doe@example.com&quot;, &quot;full_name&quot;: &quot;John Doe&quot;}}, &quot;User registered successfully&quot;, 201
+
+Number of calls: 0
+    at toHaveBeenCalledWith (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:41:39)
+    at call (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at Generator.tryCatch (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at Generator._invoke [as next] (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at asyncGeneratorStep (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at asyncGeneratorStep (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)</failure>
+    </testcase>
+    <testcase classname="UserController register should handle missing input" name="UserController register should handle missing input" time="0.001">
+    </testcase>
+    <testcase classname="UserController register should handle user already exists" name="UserController register should handle user already exists" time="0.003">
+    </testcase>
+    <testcase classname="UserController register should handle server error" name="UserController register should handle server error" time="0.004">
+    </testcase>
+    <testcase classname="UserController login should login a user successfully" name="UserController login should login a user successfully" time="0.002">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalled()
+
+Expected number of calls: &gt;= 1
+Received number of calls:    0
+    at toHaveBeenCalled (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:108:39)
+    at call (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at Generator.tryCatch (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at Generator._invoke [as next] (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at asyncGeneratorStep (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at asyncGeneratorStep (/Users/abduljeliliumaru/Desktop/Prioritify/Prioritify_apis/test/controllers/userController.spec.js:2:1)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)</failure>
+    </testcase>
+    <testcase classname="UserController login should handle missing input" name="UserController login should handle missing input" time="0.001">
+    </testcase>
+    <testcase classname="UserController login should handle invalid credentials" name="UserController login should handle invalid credentials" time="0.001">
+    </testcase>
+    <testcase classname="UserController login should handle server error" name="UserController login should handle server error" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>

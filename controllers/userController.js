@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { StatusCodes } from '../constants/statusCodes.js';
-import ResponseHandler from '../utils/responseHandler.js'; // Import without 'new'
+import ResponseHandler from '../utils/responseHandler.js';
 
 dotenv.config();
 
@@ -34,6 +34,9 @@ export const register = async (req, res) => {
       { expiresIn: '2h' }
     );
 
+    user.token = token;
+    await user.save();
+
     return ResponseHandler.success(res, { user, token }, 'User registered successfully', StatusCodes.CREATED);
   } catch (err) {
     console.error(err);
@@ -59,6 +62,7 @@ export const login = async (req, res) => {
       );
 
       user.token = token;
+      await user.save();
 
       return ResponseHandler.success(res, user, 'Login successful', StatusCodes.OK);
     }
@@ -66,6 +70,99 @@ export const login = async (req, res) => {
     return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'Invalid Credentials');
   } catch (err) {
     console.error(err);
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, '-password -token'); 
+    return ResponseHandler.success(res, users, 'All users retrieved successfully');
+  } catch (error) {
+    console.error(error);
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
+  }
+};
+
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'User ID is required');
+    }
+
+    const user = await User.findById(id, '-password -token');
+
+    if (!user) {
+      return ResponseHandler.error(res, StatusCodes.NOT_FOUND, 'User not found');
+    }
+
+    return ResponseHandler.success(res, user, 'User retrieved successfully');
+  } catch (error) {
+    console.error(error);
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
+  }
+};
+
+export const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { full_name, email, password } = req.body;
+
+    if (!id) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'User ID is required');
+    }
+
+    const updateData = {};
+    if (full_name) updateData.full_name = full_name;
+    if (email) updateData.email = email.toLowerCase();
+    if (password) {
+      const encryptedPassword = await bcrypt.hash(password, 10);
+      updateData.password = encryptedPassword;
+    }
+
+    const user = await User.findByIdAndUpdate(id, updateData, { new: true, select: '-password -token' });
+
+    if (!user) {
+      return ResponseHandler.error(res, StatusCodes.NOT_FOUND, 'User not found');
+    }
+
+    return ResponseHandler.success(res, user, 'User updated successfully');
+  } catch (error) {
+    console.error(error);
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return ResponseHandler.error(res, StatusCodes.BAD_REQUEST, 'User ID is required');
+    }
+
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return ResponseHandler.error(res, StatusCodes.NOT_FOUND, 'User not found');
+    }
+
+    return ResponseHandler.success(res, null, 'User deleted successfully');
+  } catch (error) {
+    console.error(error);
+    return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
+  }
+};
+
+// New Method for User Count
+export const getNumberOfUsers = async (req, res) => {
+  try {
+    const count = await User.countDocuments({});
+    return ResponseHandler.success(res, { count }, 'Number of users retrieved successfully');
+  } catch (error) {
+    console.error(error);
     return ResponseHandler.error(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Server error');
   }
 };
